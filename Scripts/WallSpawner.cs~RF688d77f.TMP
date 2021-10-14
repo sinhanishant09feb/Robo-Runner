@@ -1,0 +1,184 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class WallSpawner : MonoBehaviour
+{
+    [Header("Walls")]
+    public GameObject[] wallPrefabs = new GameObject[3];
+    public GameObject[] wallPrefabs2nd = new GameObject[3];
+    public GameObject halfWall;
+ 
+    [Header("Platform")]
+    public GameObject Platform;
+
+    public GameObject Player;
+    public GameObject particleToCome;
+    //public GameObject[] spawnedWalls;
+    //private int i = 0;
+    
+    
+    [Header("time of wallSpawn")]
+    [Range(0.0f,10.0f)]
+    public float t;
+    public float hT;
+    public bool wall2;
+    public bool halfW;
+
+    [Range(0.0f,30.0f)]
+    public float destroyAfter;
+    public float startTime;
+    public float score;
+
+    // Start is called before the first frame update
+     void Start()
+    {
+        t = 3.0f;
+        hT = 2.0f;
+        //spawnedWalls = new GameObject[10];
+        destroyAfter = 10.0f;
+        StartCoroutine(wallCom());
+        StartCoroutine(wallDes());
+       
+        
+        startTime = Time.deltaTime;
+        wall2 = false;
+        halfW = false;
+       
+       // Player = GameObject.FindGameObjectWithTag("Player");
+    }
+
+
+    // Update is called once per frame
+    void Update()
+    {
+
+        score = Player.GetComponent<MovementInput>().scor;
+
+      
+
+        if(score > 8000)
+        {
+            if(!wall2)
+            {
+               StartCoroutine(wallCom2());
+                wall2 = true;
+            }
+        }
+
+        if(score > 1500)
+        {
+            if(!halfW)
+            {
+                StartCoroutine(halfWallCom());
+                halfW = true;
+            }
+        }
+
+    }
+
+   
+
+    //for spawning halfWall
+    private void spawnHalf()
+    {
+        Vector3 te = new Vector3(Random.Range(Platform.transform.position.x - 2.30f, Platform.transform.position.x + 3.3f), Platform.transform.position.y,Random.Range(Player.transform.position.z + 5, Platform.transform.position.z + 80));
+       
+            
+            Instantiate(particleToCome, te, Quaternion.identity);
+            /*spawnedWalls[i] = */ Instantiate(
+                halfWall,
+                te,
+                Quaternion.identity
+                );
+
+        /*if (i == 9)
+            i = 0;
+        else
+            i++;*/
+    }
+    IEnumerator halfWallCom()
+    {
+        while(true)
+        {
+            yield return new WaitForSeconds(hT);
+            spawnHalf();
+        }
+    }
+
+    private void spawn()
+    {
+        float tem = Random.Range(Player.transform.position.z+5, Platform.transform.position.z + 80);
+        Instantiate(particleToCome,
+             new Vector3(Platform.transform.position.x, Platform.transform.position.y, tem-0.75f),
+            Quaternion.identity);
+        /*spawnedWalls[i] =*/ Instantiate(
+                  (wallPrefabs[Random.Range(0, 3)]),
+                  new Vector3(Platform.transform.position.x, Platform.transform.position.y,tem ),
+                  Quaternion.identity);
+        /*if (i == 9)
+            i = 0;
+        else
+            i++;*/
+    }
+
+
+
+    //for spawning the walls after seconds
+    IEnumerator wallCom()
+    {
+        while(true)
+        {
+            yield return new WaitForSeconds(t);
+            spawn();
+        }
+    }
+
+    private void spawn2()
+    {
+        float temp = Random.Range(Player.transform.position.z + 5, Platform.transform.position.z + 80);
+        Instantiate(particleToCome,
+            new Vector3(Platform.transform.position.x, Platform.transform.position.y, temp-0.75f),
+             Quaternion.identity);
+        /*spawnedWalls[i] =*/ Instantiate(
+                  (wallPrefabs2nd[Random.Range(0, 3)]),
+                  new Vector3(Platform.transform.position.x, Platform.transform.position.y, temp ),
+                  Quaternion.identity);
+        /*if (i == 9)
+            i = 0;
+        else
+            i++;*/
+    }
+ 
+    IEnumerator wallCom2()
+    {
+        while (true)
+        {
+            
+            {
+                yield return new WaitForSeconds(6.0f);
+                spawn2();
+            }
+        }
+    }
+
+ 
+
+
+
+    // for destroying the walls
+    IEnumerator wallDes()
+    {
+        while(true)
+        {
+            yield return new WaitForSeconds(destroyAfter);
+            dest();
+        }
+    }
+
+    private void dest()
+    {
+       // Destroy(this.gameObject);
+       // Debug.Log("Destroyed");
+    }
+}
